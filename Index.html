@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>www.termods.com.br</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    :root {
+      --primary: #003973;
+      --secondary: #e5e5be;
+      --accent: #28a745;
+      --warning: #ffc107;
+      --danger: #dc3545;
+      --bg-dark: #232946;
+      --bg-light: #f4f4f4;
+      --text-dark: #232946;
+      --text-light: #fff;
+      --cell-size: 60px;
+      --cell-radius: 18px;
+      --shadow: 0 8px 32px 0 rgba(31,38,135,0.22);
+      background-image: linear-gradient(to right, rgba(255, 255, 255, 0.5), rgba(0, 0, 0, 0.7)),
+    url('https://media.tenor.com/ShphQRiwlEgAAAAM/matrix-code.gif');
+      --glass: rgba(255,255,255,0.18);
+      --glass-blur: blur(8px);
+      --neon: 0 0 12px #28a745, 0 0 24px #28a74588;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Montserrat', 'Segoe UI', sans-serif;
+      background: var(--gradient);
+      color: var(--text-light);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding: 0;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    /* Efeito de partículas */
+    .particles {
+      position: fixed;
+      top: 0; left: 0; width: 100vw; height: 100vh;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    #game-container {
+      background: var(--glass);
+      backdrop-filter: var(--glass-blur);
+      padding: 48px 38px 38px 38px;
+      border-radius: 32px;
+      box-shadow: var(--shadow), 0 0 0 4px #6200ff22;
+      margin-top: 56px;
+      min-width: 340px;
+      max-width: 95vw;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      transition: box-shadow 0.3s;
+      position: relative;
+      z-index: 1;
+      border: 1.5px solid #6200ff;
+      animation: fadeIn 1.2s;
+    }
+
+    h1 {
+      font-size: 3.2rem;
+      letter-spacing: 2px;
+      margin: 0 0 8px 0;
+      font-weight: 700;
+      color: var(--accent);
+      text-shadow: 0 2px 16px rgba(0,0,0,0.18), 0 0 8px #28a74555;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      filter: drop-shadow(0 2px 8px #28a74588);
+      user-select: none;
+    }
+
+    h1 .icon {
+      font-size: 2.5rem;
+      filter: drop-shadow(0 2px 8px #ae00ff);
+      animation: pulse 1.5s infinite alternate;
+      text-shadow: 0 0 12px #7700ff88;
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(1);}
+      100% { transform: scale(1.13);}
+    }
+
+    h2 {
+      font-size: 1.25rem;
+      font-weight: 400;
+      margin: 0 0 8px 0;
+      letter-spacing: 1px;
+      color: #e0e0e0;
+      text-shadow: 0 1px 8px #00397344;
+      user-select: none;
+    }
+
+    #lives {
+      font-size: 2.3rem;
+      margin-bottom: 18px;
+      letter-spacing: 2px;
+      user-select: none;
+      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.15));
+      transition: color 0.3s;
+      text-shadow: 0 0 8px #ffc10755;
+      animation: fadeIn 1.2s;
+    }
+
+    #grid {
+      display: grid;
+      grid-template-columns: repeat(5, var(--cell-size));
+      gap: 14px;
+      justify-content: center;
+      margin-bottom: 22px;
+      min-height: calc(var(--cell-size) + 12px);
+      transition: min-height 0.2s;
+      background: linear-gradient(135deg, #e5e5be22 0%, #00397311 100%);
+      border-radius: 18px;
+      padding: 12px 0;
+      box-shadow: 0 2px 16px #00397322;
+    }
+
+    .cell {
+      width: var(--cell-size);
+      height: var(--cell-size);
+      background: var(--bg-light);
+      border-radius: var(--cell-radius);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.1rem;
+      font-weight: 700;
+      color: var(--text-dark);
+      text-transform: uppercase;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.10), 0 0 0 2px #00397322;
+      margin-bottom: 2px;
+      border: 2.5px solid transparent;
+      transition: background 0.3s, color 0.3s, border 0.2s, box-shadow 0.2s;
+      animation: popIn 0.25s;
+      position: relative;
+      overflow: hidden;
+      z-index: 1;
+      background-image: linear-gradient(120deg, #f4f4f4 60%, #e5e5be 100%);
+    }
+
+    .cell::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: var(--cell-radius);
+      pointer-events: none;
+      opacity: 0.13;
+      background: linear-gradient(135deg, #fff 0%, #28a745 100%);
+      z-index: 1;
+    }
+
+    @keyframes popIn {
+      0% { transform: scale(0.7);}
+      100% { transform: scale(1);}
+    }
+
+    .correct {
+      background: linear-gradient(135deg, #28a745 60%, #003973 100%);
+      color: var(--text-light);
+      border-color: #1e7e34;
+      box-shadow: var(--neon);
+      z-index: 2;
+      animation: bounce 0.5s;
+    }
+
+    .present {
+      background: linear-gradient(135deg, #ffc107 60%, #e5e5be 100%);
+      color: var(--text-dark);
+      border-color: #b38600;
+      box-shadow: 0 0 18px #ffc10755;
+      z-index: 2;
+      animation: bounce 0.5s;
+    }
+
+    .absent {
+      background: linear-gradient(135deg, #dc3545 60%, #003973 100%);
+      color: var(--text-light);
+      border-color: #a71d2a;
+      box-shadow: 0 0 18px #dc354555;
+      z-index: 2;
+      animation: shake 0.3s;
+    }
+
+    .cell:not(.correct):not(.present):not(.absent) {
+      border: 2.5px solid #e0e0e0;
+    }
+
+    @keyframes bounce {
+      0% { transform: scale(1);}
+      30% { transform: scale(1.18);}
+      60% { transform: scale(0.92);}
+      100% { transform: scale(1);}
+    }
+
+    .input-row {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 10px;
+      flex-wrap: wrap;
+      justify-content: center;
+      background: rgba(255,255,255,0.08);
+      border-radius: 10px;
+      padding: 10px 8px;
+      box-shadow: 0 2px 8px #00397322;
+    }
+
+    input[type="text"] {
+      width: 150px;
+      padding: 14px 12px;
+      font-size: 1.15rem;
+      border-radius: 8px;
+      border: 2.5px solid #e0e0e0;
+      background: #f8f8f8;
+      color: #232946;
+      text-align: center;
+      text-transform: uppercase;
+      outline: none;
+      transition: border 0.2s, background 0.2s, box-shadow 0.2s;
+      font-family: inherit;
+      font-weight: 600;
+      box-shadow: 0 2px 8px #28a74522;
+      letter-spacing: 2px;
+    }
+
+    input[type="text"]:focus {
+      border: 2.5px solid var(--primary);
+      background: #e5e5be;
+      box-shadow: 0 0 0 2px #28a74555;
+    }
+
+    button {
+      padding: 13px 20px;
+      font-size: 1.13rem;
+      border: none;
+      border-radius: 8px;
+      background: var(--primary);
+      color: var(--text-light);
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      transition: background 0.2s, transform 0.1s, box-shadow 0.2s;
+      margin: 0 2px;
+      position: relative;
+      z-index: 1;
+      letter-spacing: 1px;
+      outline: none;
+    }
+
+    button:hover, button:focus {
+      background: #b700ff;
+      transform: translateY(-2px) scale(1.04);
+      box-shadow: 0 0 0 3px #8400ff55;
+    }
+
+    #hint {
+      margin: 12px 0 0 0;
+      font-size: 1.08rem;
+      color: #ffe082;
+      opacity: 0.92;
+      background: rgba(0,0,0,0.18);
+      border-radius: 10px;
+      padding: 8px 20px;
+      display: none;
+      transition: opacity 0.3s;
+      box-shadow: 0 2px 8px #ffc10733;
+      border: 1.5px solid #ffc10755;
+      text-align: center;
+      font-weight: 600;
+      letter-spacing: 1px;
+    }
+
+    #hint.visible {
+      display: block;
+      animation: fadeIn 0.5s;
+    }
+
+    .shake {
+      animation: shake 0.3s;
+    }
+    @keyframes shake {
+      0% { transform: translateX(0);}
+      20% { transform: translateX(-8px);}
+      40% { transform: translateX(8px);}
+      60% { transform: translateX(-8px);}
+      80% { transform: translateX(8px);}
+      100% { transform: translateX(0);}
+    }
+
+    #win-screen {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw; height: 100vh;
+      background: rgba(0,0,0,0.92);
+      color: #fff;
+      font-size: 2.3rem;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      z-index: 999;
+      animation: fadeIn 0.7s;
+      text-align: center;
+      padding: 0 20px;
+      gap: 18px;
+    }
+
+    #win-screen .trophy {
+      font-size: 4.5rem;
+      color: #ffc107;
+      filter: drop-shadow(0 0 18px #ffc10799);
+      margin-bottom: 10px;
+      animation: pulse 1.2s infinite alternate;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    #win-screen button {
+      margin-top: 24px;
+      background: var(--accent);
+      color: #fff;
+      font-size: 1.2rem;
+      padding: 14px 28px;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.12), 0 0 0 3px #28a74555;
+      transition: background 0.2s, box-shadow 0.2s;
+      font-weight: 700;
+      letter-spacing: 1px;
+    }
+
+    #win-screen button:hover {
+      background: #218838;
+      box-shadow: 0 0 0 5px #28a74555;
+    }
+
+    #message {
+      margin-top: 14px;
+      font-size: 1.13rem;
+      font-weight: 600;
+      min-height: 28px;
+      color: #ffe082;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.13);
+      letter-spacing: 1px;
+      transition: color 0.3s;
+      text-align: center;
+      animation: fadeIn 0.7s;
+    }
+
+    #footer {
+      margin-top: 54px;
+      font-size: 1.05rem;
+      opacity: 0.7;
+      color: #e0e0e0;
+      text-align: center;
+      letter-spacing: 1px;
+      text-shadow: 0 1px 8px #00397344;
+      user-select: none;
+    }
+
+    /* Animação de brilho para o botão de dica */
+    #hint-btn {
+      background: linear-gradient(90deg, #ffc107 0%, #28a745 100%);
+      color: #232946;
+      font-weight: 800;
+      box-shadow: 0 0 12px #ffc10755, 0 0 0 2px #28a74555;
+      border: 2px solid #ffc10755;
+      animation: shine 2.5s infinite linear;
+    }
+    #hint-btn:hover, #hint-btn:focus {
+      background: linear-gradient(90deg, #28a745 0%, #ffc107 100%);
+      color: #fff;
+      box-shadow: 0 0 18px #ffc10799, 0 0 0 4px #28a74555;
+    }
+    @keyframes shine {
+      0% { filter: brightness(1);}
+      50% { filter: brightness(1.18);}
+      100% { filter: brightness(1);}
+    }
+
+    /* Responsivo */
+    @media (max-width: 500px) {
+      #game-container {
+        min-width: unset;
+        padding: 18px 4vw 18px 4vw;
+      }
+      .cell {
+        width: 44px;
+        height: 44px;
+        font-size: 1.2rem;
+      }
+      #grid {
+        grid-template-columns: repeat(5, 44px);
+        gap: 7px;
+      }
+      input[type="text"] {
+        width: 90px;
+        font-size: 1rem;
+      }
+      button {
+        font-size: 1rem;
+        padding: 10px 10px;
+      }
+      #win-screen {
+        font-size: 1.3rem;
+      }
+      #win-screen .trophy {
+        font-size: 2.5rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <canvas class="particles"></canvas>
+  <div id="game-container">
+    <h1><span class="icon">💻</span> <span style="color: rgba(255, 0, 0, 0.733);"> Termo </span> <span style="font-size:1.2rem;color:#6607ff;text-shadow:0 0 8px #8707ff99;">Ds</span></h1>
+    <h2><i class="fa-solid fa-heart-pulse"></i> Tentativas</h2>
+    <div id="lives">❤️❤️❤️❤️❤️</div>
+    <div id="grid"></div>
+    <div class="input-row">
+      <input type="text" id="guess" maxlength="5" placeholder="Palavra..." autocomplete="off" />
+      <button onclick="submitGuess()"><i class="fa-solid fa-check"></i> Tentar</button>
+      <button onclick="restartGame()"><i class="fa-solid fa-rotate"></i> Reiniciar</button>
+      <button id="hint-btn" title="Dica"><i class="fa-solid fa-lightbulb"></i> Dica</button>
+    </div>
+    <div id="hint"></div>
+    <div id="message"></div>
+  </div>
+
+  <div id="win-screen">
+    <div class="trophy"><i class="fa-solid fa-trophy"></i></div>
+    <div>🎉 Você acertou a palavra!</div>
+    <button onclick="restartGame()"><i class="fa-solid fa-play"></i> Jogar Novamente</button>
+  </div>
+
+  <div id="footer">
+    &copy; 2025 Termo 2° DS&mdash; Jogo inspirado no clássico Termo.<br>
+    Desenvolvido para fins educacionais.
+  </div>
+
+  <script>
+    // Palavras e dicas (adicione mais para maior variedade)
+    const secretWords = [
+      { word: "SECAS", hint: "Falta de água por longos períodos." },
+      { word: "CLIMA", hint: "Conjunto de condições atmosféricas." },
+      { word: "DANOS", hint: "Consequências negativas de eventos extremos." },
+      { word: "SECAR", hint: "Ato de perder água." },
+      { word: "CRISE", hint: "Situação de emergência hídrica." },
+      { word: "CHUVA", hint: "Precipitação de água do céu." },
+      { word: "GOTAS", hint: "Pequenas porções de líquido." },
+
+  { word: "CASA", hint: "Lugar onde moramos." },
+  { word: "ÁGUA", hint: "Líquido essencial para a vida." },
+  { word: "SOLAR", hint: "Relacionado ao Sol." },
+  { word: "BOMBA", hint: "Explosivo ou algo que lança ar." },
+  { word: "FELIZ", hint: "Quando estamos contentes." },
+  { word: "NORTE", hint: "Um dos pontos cardeais." },
+  { word: "MELAR", hint: "Deixar algo sujo ou manchado." },
+  { word: "LIVRO", hint: "Objeto para ler." },
+  { word: "FLOTA", hint: "Conjunto de barcos ou navios." },
+  { word: "RUÍDO", hint: "Som alto ou desagradável." },
+  { word: "DENTE", hint: "Parte dura na boca usada para mastigar." },
+  { word: "MUNDO", hint: "Planeta onde vivemos." },
+  { word: "FALAR", hint: "Expressar palavras." },
+  { word: "PESCA", hint: "Ato de pegar peixes." },
+  { word: "GENTE", hint: "Pessoas em geral." },
+  { word: "PLANO", hint: "Algo organizado ou sem relevo." },
+  { word: "SONHO", hint: "Imagens que vemos enquanto dormimos." },
+  { word: "VIVER", hint: "Estar vivo; existir." },
+  { word: "FUGIR", hint: "Sair correndo para escapar." },
+  { word: "CHAVE", hint: "Usada para abrir portas." },
+  { word: "FAROL", hint: "Luz usada para sinalizar." },
+  { word: "TRIGO", hint: "Grão usado para fazer pão." },
+  { word: "COISA", hint: "Objeto qualquer, sem especificar." },
+  { word: "PUNHO", hint: "Parte da mão usada para dar soco." },
+  { word: "CANTO", hint: "Parte de um lugar, ou música curta." },
+  { word: "RIRAM", hint: "Passado do verbo rir." },
+  { word: "JUNTO", hint: "Perto, ao lado." },
+  { word: "LEITE", hint: "Bebida branca de vaca." },
+  { word: "FUGIR", hint: "Sair correndo para escapar." },
+  { word: "DANÇA", hint: "Movimento do corpo ao som de música." },
+  { word: "AMIGO", hint: "Pessoa com quem temos amizade." },
+  { word: "PÁSSO", hint: "Movimento ao caminhar." },
+  { word: "BONUS", hint: "Recompensa extra." },
+  { word: "MEXER", hint: "Movimentar algo com as mãos." },
+  { word: "FAROL", hint: "Luz que orienta os navios." },
+  { word: "PENTE", hint: "Usado para arrumar o cabelo." },
+  { word: "GITAR", hint: "Instrumento musical de cordas." },
+  { word: "PLENO", hint: "Totalmente cheio ou completo." },
+  { word: "NUTRE", hint: "Alimenta ou cuida da saúde." },
+  { word: "FAROL", hint: "Equipamento que emite luz para sinalizar." },
+  { word: "CAVAL", hint: "Animal usado em cavalgar." },
+  { word: "JOGAR", hint: "Atividade de esporte ou diversão." },
+  { word: "REDE", hint: "Tela usada para pescar ou dormir." },
+  { word: "MOVER", hint: "Fazer algo se deslocar." },
+  { word: "BOLA", hint: "Objeto usado em vários esportes." },
+  { word: "LIVRO", hint: "Objeto de leitura com páginas." },
+  { word: "FUGIR", hint: "Escapar rapidamente de algo." },
+  { word: "FALAR", hint: "Expressar palavras com a boca." },
+  { word: "VIDRO", hint: "Material transparente, usado em janelas." },
+  { word: "GOLFE", hint: "Jogo que utiliza uma pequena bola e taco." },
+  { word: "CANTO", hint: "Local em que algo está posicionado." },
+  { word: "PRAIA", hint: "Área de terra perto do mar." },
+  { word: "LOJA", hint: "Lugar onde compramos coisas." },
+  { word: "GOSTO", hint: "Sensação no paladar." },
+  { word: "LIMBO", hint: "Estado intermediário, entre duas fases." },
+  { word: "PEIXE", hint: "Animal aquático com barbatanas." },
+  { word: "SABOR", hint: "Sensação de gosto na boca." },
+  { word: "LINHA", hint: "Corda fina ou traço contínuo." },
+  { word: "RETO", hint: "Que não é curvado, direto." },
+  { word: "FURAR", hint: "Fazer um buraco em algo." },
+  { word: "CORPO", hint: "Parte física de um ser vivo." },
+  { word: "FAZER", hint: "Realizar ou executar algo." },
+  { word: "LUZES", hint: "Fontes de iluminação." },
+  { word: "SERES", hint: "Seres vivos, criaturas." },
+  { word: "VIVOS", hint: "Aqueles que têm vida." },
+  { word: "PODE", hint: "Capacidade de fazer algo." },
+  { word: "MANTE", hint: "Produto derivado do leite." },
+  { word: "ALUNO", hint: "Pessoa que estuda em uma escola." },
+  { word: "MARCO", hint: "Ponto de referência importante." },
+  { word: "CAIXA", hint: "Objeto para guardar coisas." },
+  { word: "TURMA", hint: "Grupo de pessoas." },
+  { word: "PAU", hint: "Madeira ou vara." },
+  { word: "PEQUENO", hint: "Algo que não é grande." },
+  { word: "TROCA", hint: "Ato de substituir algo por outra coisa." },
+  { word: "CAOS", hint: "Estado de desordem." },
+  { word: "PULGA", hint: "Inseto pequeno que salta." },
+  { word: "CAVAL", hint: "Animal de quatro patas, usado em montarias." },
+  { word: "PEDRA", hint: "Material sólido e durável da natureza." },
+  { word: "FOLHA", hint: "Parte verde das plantas." },
+  { word: "CAMPO", hint: "Área de terra para cultivo ou esporte." },
+  { word: "BOLO", hint: "Sobremesa doce e assada." },
+  { word: "FESTA", hint: "Evento social com música e comida." },
+  { word: "GATA", hint: "Animal felino doméstico." },
+  { word: "CAMPO", hint: "Terreno aberto ou campo esportivo." },
+  { word: "TRIGO", hint: "Grão usado para fazer farinha." },
+  { word: "LUZ", hint: "O que ilumina o ambiente." },
+  { word: "VOTO", hint: "Escolha em uma eleição." },
+  { word: "JULHO", hint: "Mês do verão no hemisfério norte." },
+  { word: "MOLHO", hint: "Substância líquida usada para temperar." },
+  { word: "ALVO", hint: "Objetivo a ser atingido." },
+  { word: "PIADA", hint: "História engraçada." },
+  { word: "GATO", hint: "Animal doméstico felino." },
+  { word: "MEXE", hint: "Ato de movimentar algo." },
+  { word: "RUGA", hint: "Linha na pele devido à idade." },
+  { word: "VIRAR", hint: "Alterar a direção." },
+  { word: "MORAR", hint: "Viver em um lugar específico." },
+  { word: "ABRIL", hint: "Mês do ano." },
+  { word: "FENDA", hint: "Abertura ou rachadura." },
+  { word: "MESA", hint: "Objeto para apoiar objetos ou refeições." },
+  { word: "ALMOÇO", hint: "Refeição do meio-dia." }
+];
+
+
+
+
+
+    
+    let secret, lives, gameOver, hintUsed = false, currentHint = "";
+
+    const grid = document.getElementById("grid");
+    const message = document.getElementById("message");
+    const livesDisplay = document.getElementById("lives");
+    const winScreen = document.getElementById("win-screen");
+    const guessInput = document.getElementById("guess");
+    const hintDiv = document.getElementById("hint");
+    const hintBtn = document.getElementById("hint-btn");
+
+    // Histórico de tentativas para exibir animação de fade
+    let attempts = [];
+
+    function startGame() {
+      const chosen = secretWords[Math.floor(Math.random() * secretWords.length)];
+      secret = chosen.word;
+      currentHint = chosen.hint;
+      hintDiv.textContent = currentHint;
+      hintDiv.classList.remove("visible");
+      hintUsed = false;
+      lives = 5;
+      gameOver = false;
+      grid.innerHTML = "";
+      message.textContent = "";
+      winScreen.style.display = "none";
+      guessInput.value = "";
+      guessInput.disabled = false;
+      attempts = [];
+      updateLivesDisplay();
+      guessInput.focus();
+    }
+
+    function updateLivesDisplay() {
+      livesDisplay.innerHTML = "❤️".repeat(lives) + "🤍".repeat(5 - lives);
+      if (lives === 1) {
+        livesDisplay.style.color = "#ffc107";
+        livesDisplay.style.textShadow = "0 0 12px #ffc10799";
+      } else if (lives === 0) {
+        livesDisplay.style.color = "#dc3545";
+        livesDisplay.style.textShadow = "0 0 12px #dc354599";
+      } else {
+        livesDisplay.style.color = "";
+        livesDisplay.style.textShadow = "0 0 8px #ffc10755";
+      }
+    }
+
+    function createRow(word, colors) {
+      // Cria uma linha animada para cada tentativa
+      const row = document.createElement("div");
+      row.style.display = "contents";
+      for (let i = 0; i < 5; i++) {
+        const cell = document.createElement("div");
+        cell.classList.add("cell");
+        cell.textContent = word[i];
+        cell.classList.add(colors[i]);
+        cell.style.animationDelay = (i * 0.08) + "s";
+        row.appendChild(cell);
+      }
+      grid.appendChild(row);
+      // Scroll para baixo se necessário
+      grid.scrollTop = grid.scrollHeight;
+    }
+
+    function checkWord(guess) {
+      const colors = Array(5).fill("absent");
+      const count = {};
+
+      for (let ch of secret) {
+        count[ch] = (count[ch] || 0) + 1;
+      }
+
+      for (let i = 0; i < 5; i++) {
+        if (guess[i] === secret[i]) {
+          colors[i] = "correct";
+          count[guess[i]]--;
+        }
+      }
+
+      for (let i = 0; i < 5; i++) {
+        if (colors[i] === "correct") continue;
+        if (secret.includes(guess[i]) && count[guess[i]] > 0) {
+          colors[i] = "present";
+          count[guess[i]]--;
+        }
+      }
+
+      return colors;
+    }
+
+    function submitGuess() {
+      if (gameOver) return;
+
+      const guess = guessInput.value.toUpperCase().trim();
+
+      if (guess.length !== 5 || !/^[A-ZÇÃÕÁÉÍÓÚÂÊÔÀÈÌÒÙÜÇ]{5}$/.test(guess)) {
+        message.textContent = "Digite uma palavra válida de 5 letras.";
+        guessInput.classList.add("shake");
+        setTimeout(() => guessInput.classList.remove("shake"), 350);
+        guessInput.focus();
+        return;
+      }
+
+      const colors = checkWord(guess);
+      createRow(guess, colors);
+      guessInput.value = "";
+
+      if (guess === secret) {
+        gameOver = true; // Corrigido: define gameOver imediatamente ao acertar
+        setTimeout(() => {
+          winScreen.innerHTML = `
+            <div class="trophy"><i class="fa-solid fa-trophy"></i></div>
+            <div>🎉 Você acertou a palavra!</div>
+            <button onclick="restartGame()"><i class="fa-solid fa-play"></i> Jogar Novamente</button>
+          `;
+          winScreen.style.display = "flex";
+          guessInput.disabled = true;
+          message.textContent = "";
+        }, 400);
+      } else {
+        lives--;
+        updateLivesDisplay();
+        message.textContent = `Você errou. Perdeu 1 vida.`;
+
+        if (lives === 0 && !gameOver) { // Só mostra derrota se não venceu
+          setTimeout(() => {
+            winScreen.innerHTML = `
+              <div class="trophy" style="color:#dc3545;"><i class="fa-solid fa-skull-crossbones"></i></div>
+              <div style="margin-bottom:10px;">💧 Você perdeu!<br>A palavra era <b>${secret}</b>.</div>
+              <button onclick="restartGame()"><i class="fa-solid fa-play"></i> Jogar Novamente</button>
+            `;
+            winScreen.style.display = "flex";
+            gameOver = true;
+            guessInput.disabled = true;
+            message.textContent = "";
+          }, 400);
+        }
+      }
+      guessInput.focus();
+    }
+
+    function restartGame() {
+      startGame();
+    }
+
+    // Enter para tentar
+    guessInput.addEventListener("keyup", function(e) {
+      if (e.key === "Enter") submitGuess();
+    });
+
+    // Botão de dica
+    hintBtn.addEventListener("click", function() {
+      if (!hintUsed) {
+        hintDiv.classList.add("visible");
+        hintUsed = true;
+      } else {
+        hintDiv.classList.toggle("visible");
+      }
+    });
+
+    // Efeito de partículas de fundo (mais complexo)
+    function particles() {
+      const canvas = document.querySelector('.particles');
+      const ctx = canvas.getContext('2d');
+      let w = window.innerWidth, h = window.innerHeight;
+      canvas.width = w; canvas.height = h;
+      let arr = [];
+      for (let i = 0; i < 48; i++) {
+        arr.push({
+          x: Math.random() * w,
+          y: Math.random() * h,
+          r: Math.random() * 2.5 + 1.5,
+          dx: (Math.random() - 0.5) * 0.7,
+          dy: (Math.random() - 0.5) * 0.7,
+          c: `rgba(${0+Math.floor(Math.random()*60)},${57+Math.floor(Math.random()*100)},${115+Math.floor(Math.random()*100)},${Math.random()*0.22+0.13})`,
+          glow: Math.random() > 0.7
+        });
+      }
+      function draw() {
+        ctx.clearRect(0,0,w,h);
+        for (let p of arr) {
+          ctx.save();
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.r, 0, 2 * Math.PI);
+          ctx.fillStyle = p.c;
+          if (p.glow) {
+            ctx.shadowColor = "#28a745";
+            ctx.shadowBlur = 18;
+          } else {
+            ctx.shadowBlur = 0;
+          }
+          ctx.globalAlpha = 0.7 + Math.sin(Date.now()/700 + p.x) * 0.2;
+          ctx.fill();
+          ctx.restore();
+          p.x += p.dx; p.y += p.dy;
+          if (p.x < 0 || p.x > w) p.dx *= -1;
+          if (p.y < 0 || p.y > h) p.dy *= -1;
+        }
+        requestAnimationFrame(draw);
+      }
+      draw();
+      window.addEventListener('resize', () => {
+        w = window.innerWidth; h = window.innerHeight;
+        canvas.width = w; canvas.height = h;
+      });
+    }
+
+    particles();
+    startGame();
+  </script>
+  <br>
+  <center> <a href="telainicio.html"><button>Menu Principal</button></a></center>
+</body>
+</html>

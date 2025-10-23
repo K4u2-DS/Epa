@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jogo da Velha (Tic-Tac-Toe)</title>
+    <style>
+         :root {
+      --primary: #d400ff;
+         }
+        
+        /* Estilos CSS (Mantenha os mesmos do código anterior, mas adicione estilo para o seletor) */
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+           background-image: linear-gradient(to right, rgba(255, 255, 255, 0.5), rgba(0, 0, 0, 0.7)),
+    url('https://media.tenor.com/ShphQRiwlEgAAAAM/matrix-code.gif');
+            color: #333;
+        }
+
+        h1 {
+            color: #4CAF50;
+        }
+
+        .game-container {
+            text-align: center;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .mode-selection button {
+            padding: 10px 20px;
+            margin: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+
+        #mode-player {
+            background-color: #a200ff;
+            color: white;
+        }
+
+        #mode-player:hover {
+            background-color: #0b7dda;
+        }
+
+        #mode-bot {
+            background-color: #597705;
+            color: white;
+        }
+
+        #mode-bot:hover {
+            background-color: #fb8c00;
+        }
+
+        .difficulty-selection {
+            margin: 15px 0;
+        }
+
+        .difficulty-selection select {
+            padding: 8px;
+            font-size: 16px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+        
+        /* Estilos do Tabuleiro (board, cell, etc.) permanecem os mesmos */
+        .board {
+            display: grid;
+            grid-template-columns: repeat(3, 120px);
+            grid-template-rows: repeat(3, 100px);
+            gap: 5px;
+            margin: 20px auto;
+            border: 5px solid #333;
+            background-color: #333;
+        }
+
+        .cell {
+            background-color: #ff0000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 60px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.1s;
+        }
+
+        .cell:not(:empty) {
+            cursor: default;
+        }
+
+        .cell:hover:empty {
+            background-color: #e0e0e0;
+        }
+
+        #status {
+            font-size: 20px;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+
+        #reset-button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            background-color: #F44336;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            margin-top: 10px;
+            transition: background-color 0.3s;
+        }
+
+        #reset-button:hover {
+            background-color: #d32f2f;
+        }
+        button {
+      padding: 13px 20px;
+      font-size: 1.13rem;
+      border: none;
+      border-radius: 8px;
+      background: var(--primary);
+      color: var(--text-light);
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      transition: background 0.2s, transform 0.1s, box-shadow 0.2s;
+      margin: 0 2px;
+      position: relative;
+      z-index: 1;
+      letter-spacing: 1px;
+      outline: none;
+    }
+
+    button:hover, button:focus {
+      background: #b700ff;
+      transform: translateY(-2px) scale(1.04);
+      box-shadow: 0 0 0 3px #8400ff55;
+    }
+
+    </style>
+</head>
+<body>
+
+    <div class="game-container">
+        <h1>Jogo da Velha</h1>
+
+        <div class="mode-selection">
+            <p>Selecione o Modo de Jogo:</p>
+            <button id="mode-player" onclick="setMode('player')">2 Jogadores</button>
+            <button id="mode-bot" onclick="showDifficultySelection()">Contra o Bot (IA)</button>
+        </div>
+        
+        <div id="difficulty-selection" class="difficulty-selection" style="display: none;">
+            <label for="difficulty">Dificuldade do Bot:</label>
+            <br>
+            <select id="difficulty">
+                <option value="easy">Fácil</option>
+                <option value="medium">Médio</option>
+                <option value="hard">Impossível (Minimax)</option>
+            </select>
+            <button onclick="setMode('bot')">Confirmar</button>
+        </div>
+
+        <div id="game-area" style="display: none;">
+            <p id="status">Selecione uma célula</p>
+            <div class="board" id="board">
+                </div>
+            <button id="reset-button" onclick="resetGame()">Reiniciar Jogo</button>
+        </div>
+    </div>
+    
+    ````
+
+<!-- 
+### 2. Lógica JavaScript com Dificuldades (Minimax) -->
+
+<!-- Aqui está o novo JavaScript que inclui a lógica do **Minimax** para a dificuldade "Impossível".
+
+```javascript -->
+    <script>
+        // Lógica JavaScript
+        const boardElement = document.getElementById('board');
+        const statusElement = document.getElementById('status');
+        const gameArea = document.getElementById('game-area');
+        const difficultySelect = document.getElementById('difficulty');
+        const difficultySelectionDiv = document.getElementById('difficulty-selection');
+        const cells = [];
+        let gameMode = null; // 'player' ou 'bot'
+        let botDifficulty = 'easy';
+        let boardState = ['', '', '', '', '', '', '', '', ''];
+        let currentPlayer = 'X';
+        let gameActive = true;
+        const HUMAN_PLAYER = 'X';
+        const BOT_PLAYER = 'O';
+
+        const winningConditions = [
+            [0, 1, 2], [3, 4, 5], [6, 7, 8], // Linhas
+            [0, 3, 6], [1, 4, 7], [2, 5, 8], // Colunas
+            [0, 4, 8], [2, 4, 6] // Diagonais
+        ];
+
+        /**
+         * Exibe o seletor de dificuldade e reseta a área de jogo.
+         */
+        function showDifficultySelection() {
+            difficultySelectionDiv.style.display = 'block';
+            gameArea.style.display = 'none';
+        }
+
+        /**
+         * Define o modo de jogo e inicia o jogo.
+         * @param {string} mode - 'player' para 2 jogadores ou 'bot' para jogar contra o computador.
+         */
+        function setMode(mode) {
+            gameMode = mode;
+            if (mode === 'bot') {
+                botDifficulty = difficultySelect.value;
+                difficultySelectionDiv.style.display = 'none';
+            }
+            gameArea.style.display = 'block';
+            resetGame();
+        }
+
+        // ... Funções initializeBoard e resetGame (iguais ao código anterior)
+        function initializeBoard() {
+            boardElement.innerHTML = ''; 
+            cells.length = 0; 
+            for (let i = 0; i < 9; i++) {
+                const cell = document.createElement('div');
+                cell.classList.add('cell');
+                cell.dataset.index = i;
+                cell.addEventListener('click', () => handleCellClick(i));
+                boardElement.appendChild(cell);
+                cells.push(cell);
+            }
+        }
+
+        function resetGame() {
+            boardState = ['', '', '', '', '', '', '', '', ''];
+            currentPlayer = HUMAN_PLAYER;
+            gameActive = true;
+            initializeBoard();
+            statusElement.textContent = `É a vez do ${currentPlayer}`;
+        }
+        // ... Fim das funções iguais
+
+        function makeMove(index, player) {
+            boardState[index] = player;
+            cells[index].textContent = player;
+        }
+
+        /**
+         * Verifica se o jogador atual venceu.
+         * @param {Array<string>} board - O estado do tabuleiro a ser checado.
+         * @param {string} player - O símbolo do jogador ('X' ou 'O').
+         * @returns {boolean}
+         */
+        function checkWin(board, player) {
+            return winningConditions.some(condition => {
+                return condition.every(index => {
+                    return board[index] === player;
+                });
+            });
+        }
+
+        function checkResult() {
+            if (checkWin(boardState, currentPlayer)) {
+                gameActive = false;
+                statusElement.textContent = `O Jogador ${currentPlayer} Venceu!`;
+                // Destaque as células vencedoras
+                winningConditions.forEach(condition => {
+                    if (boardState[condition[0]] === currentPlayer && boardState[condition[0]] === boardState[condition[1]] && boardState[condition[0]] === boardState[condition[2]]) {
+                         cells[condition[0]].style.backgroundColor = cells[condition[1]].style.backgroundColor = cells[condition[2]].style.backgroundColor = '#4CAF50';
+                    }
+                });
+                return true;
+            }
+
+            if (!boardState.includes('')) {
+                gameActive = false;
+                statusElement.textContent = `Empate!`;
+                return true;
+            }
+
+            return false;
+        }
+        
+        function handleCellClick(index) {
+            if (boardState[index] !== '' || !gameActive || (gameMode === 'bot' && currentPlayer === BOT_PLAYER)) {
+                return;
+            }
+
+            // Jogada do Jogador
+            makeMove(index, currentPlayer);
+
+            if (checkResult()) {
+                return;
+            }
+
+            // Troca o jogador
+            currentPlayer = currentPlayer === HUMAN_PLAYER ? BOT_PLAYER : HUMAN_PLAYER;
+            statusElement.textContent = `É a vez do ${currentPlayer}`;
+
+            // Se o modo for 'bot' e for a vez do Bot
+            if (gameMode === 'bot' && currentPlayer === BOT_PLAYER) {
+                // Desabilita cliques enquanto o bot "pensa"
+                setTimeout(botMove, 500); 
+            }
+        }
+
+        // ----------------------------------------------------------------
+        // LÓGICA DO BOT (IA)
+        // ----------------------------------------------------------------
+
+        function botMove() {
+            let move;
+
+            if (botDifficulty === 'easy') {
+                move = easyMove(boardState);
+            } else if (botDifficulty === 'medium') {
+                move = mediumMove(boardState);
+            } else { // 'hard'
+                move = hardMove(boardState);
+            }
+
+            if (move !== undefined && gameActive) {
+                makeMove(move, BOT_PLAYER);
+
+                if (checkResult()) {
+                    return;
+                }
+
+                // Troca o jogador de volta para 'X'
+                currentPlayer = HUMAN_PLAYER;
+                statusElement.textContent = `É a vez do ${currentPlayer}`;
+            }
+        }
+
+        /**
+         * Retorna índices vazios.
+         */
+        function getAvailableMoves(board) {
+            return board
+                .map((val, index) => val === '' ? index : null)
+                .filter(val => val !== null);
+        }
+
+        // --- DIFICULDADE FÁCIL (ALEATÓRIA) ---
+        function easyMove(board) {
+            const available = getAvailableMoves(board);
+            const randomIndex = Math.floor(Math.random() * available.length);
+            return available[randomIndex];
+        }
+
+        // --- DIFICULDADE MÉDIA (Prioriza Vencer/Bloquear) ---
+        function mediumMove(board) {
+            // 1. Tenta vencer na próxima jogada (jogada ofensiva)
+            for (const move of getAvailableMoves(board)) {
+                let newBoard = [...board];
+                newBoard[move] = BOT_PLAYER;
+                if (checkWin(newBoard, BOT_PLAYER)) {
+                    return move;
+                }
+            }
+
+            // 2. Tenta bloquear a vitória do jogador (jogada defensiva)
+            for (const move of getAvailableMoves(board)) {
+                let newBoard = [...board];
+                newBoard[move] = HUMAN_PLAYER;
+                if (checkWin(newBoard, HUMAN_PLAYER)) {
+                    return move;
+                }
+            }
+
+            // 3. Senão, joga aleatoriamente (como o modo Fácil)
+            return easyMove(board);
+        }
+
+        // --- DIFICULDADE IMPOSSÍVEL (ALGORITMO MINIMAX) ---
+
+        /**
+         * O Algoritmo Minimax.
+         * @param {Array<string>} currentBoard - O estado atual do tabuleiro.
+         * @param {string} player - O jogador atual ('X' ou 'O').
+         * @returns {object} - Contém o score e o melhor movimento (bestMove).
+         */
+        function minimax(currentBoard, player) {
+            const availableMoves = getAvailableMoves(currentBoard);
+
+            // Verifica estados terminais e retorna o score
+            if (checkWin(currentBoard, HUMAN_PLAYER)) {
+                return { score: -10 }; // Jogador humano vence: Score baixo
+            } else if (checkWin(currentBoard, BOT_PLAYER)) {
+                return { score: 10 }; // Bot vence: Score alto
+            } else if (availableMoves.length === 0) {
+                return { score: 0 }; // Empate: Score neutro
+            }
+
+            // Armazenar todos os movimentos e seus scores
+            const moves = [];
+
+            // Itera sobre todos os movimentos possíveis
+            for (let i = 0; i < availableMoves.length; i++) {
+                const move = {};
+                move.index = availableMoves[i];
+                
+                // 1. Faz o movimento no tabuleiro temporário
+                currentBoard[availableMoves[i]] = player;
+
+                // 2. Chama o minimax recursivamente para o próximo jogador
+                if (player === BOT_PLAYER) {
+                    const result = minimax(currentBoard, HUMAN_PLAYER);
+                    move.score = result.score;
+                } else {
+                    const result = minimax(currentBoard, BOT_PLAYER);
+                    move.score = result.score;
+                }
+
+                // 3. Desfaz o movimento (limpa o tabuleiro)
+                currentBoard[availableMoves[i]] = '';
+
+                // 4. Salva o movimento
+                moves.push(move);
+            }
+
+            // Encontra o melhor movimento para o jogador atual
+            let bestMove;
+            if (player === BOT_PLAYER) {
+                // Bot (maximizador) quer o score mais alto
+                let bestScore = -Infinity;
+                for (let i = 0; i < moves.length; i++) {
+                    if (moves[i].score > bestScore) {
+                        bestScore = moves[i].score;
+                        bestMove = i;
+                    }
+                }
+            } else {
+                // Humano (minimizador) quer o score mais baixo
+                let bestScore = Infinity;
+                for (let i = 0; i < moves.length; i++) {
+                    if (moves[i].score < bestScore) {
+                        bestScore = moves[i].score;
+                        bestMove = i;
+                    }
+                }
+            }
+
+            return moves[bestMove];
+        }
+
+        function hardMove(board) {
+            const bestMoveObject = minimax([...board], BOT_PLAYER);
+            return bestMoveObject.index;
+        }
+
+        // Inicialização: a área de jogo começa oculta
+        document.addEventListener('DOMContentLoaded', () => {
+             statusElement.textContent = "Selecione um modo de jogo para começar.";
+        });
+    </script>
+    <br>
+    <center><a href="telainicio.html"><button style="color:white;">Menu Principal</button></a></center>
+</body>
+
+</html>
