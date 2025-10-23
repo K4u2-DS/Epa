@@ -1,0 +1,152 @@
+:root {
+    --primary: #d400ff;
+}
+
+/* ======= LAYOUT ======= */
+body {
+    font-family: Arial, sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    margin: 0;
+    background-image: linear-gradient(to right, rgba(255, 255, 255, 0.5), rgba(0, 0, 0, 0.7)),
+        url('https://media.tenor.com/ShphQRiwlEgAAAAM/matrix-code.gif');
+    color: #333;
+}
+
+/* ======= CONTAINER PRINCIPAL ======= */
+.game-container {
+    text-align: center;
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* ======= TÍTULO ======= */
+h1 {
+    color: #4CAF50;
+}
+
+/* ======= BOTÕES DE MODO ======= */
+.mode-selection button {
+    padding: 10px 20px;
+    margin: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    border: none;
+    border-radius: 5px;
+    transition: background-color 0.3s;
+}
+
+#mode-player {
+    background-color: #a200ff;
+    color: white;
+}
+
+#mode-player:hover {
+    background-color: #0b7dda;
+}
+
+#mode-bot {
+    background-color: #597705;
+    color: white;
+}
+
+#mode-bot:hover {
+    background-color: #fb8c00;
+}
+
+/* ======= SELEÇÃO DE DIFICULDADE ======= */
+.difficulty-selection {
+    margin: 15px 0;
+}
+
+.difficulty-selection select {
+    padding: 8px;
+    font-size: 16px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+}
+
+/* ======= TABULEIRO ======= */
+.board {
+    display: grid;
+    grid-template-columns: repeat(3, 120px);
+    grid-template-rows: repeat(3, 100px);
+    gap: 5px;
+    margin: 20px auto;
+    border: 5px solid #333;
+    background-color: #333;
+}
+
+/* ======= CÉLULAS ======= */
+.cell {
+    background-color: #ff0000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 60px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.1s;
+}
+
+.cell:not(:empty) {
+    cursor: default;
+}
+
+.cell:hover:empty {
+    background-color: #e0e0e0;
+}
+
+/* ======= STATUS ======= */
+#status {
+    font-size: 20px;
+    margin-bottom: 15px;
+    font-weight: bold;
+}
+
+/* ======= BOTÃO REINICIAR ======= */
+#reset-button {
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    background-color: #F44336;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    margin-top: 10px;
+    transition: background-color 0.3s;
+}
+
+#reset-button:hover {
+    background-color: #d32f2f;
+}
+
+/* ======= BOTÕES GERAIS ======= */
+button {
+    padding: 13px 20px;
+    font-size: 1.13rem;
+    border: none;
+    border-radius: 8px;
+    background: var(--primary);
+    color: white;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    transition: background 0.2s, transform 0.1s, box-shadow 0.2s;
+    margin: 0 2px;
+    position: relative;
+    z-index: 1;
+    letter-spacing: 1px;
+    outline: none;
+}
+
+button:hover, button:focus {
+    background: #b700ff;
+    transform: translateY(-2px) scale(1.04);
+    box-shadow: 0 0 0 3px #8400ff55;
+}

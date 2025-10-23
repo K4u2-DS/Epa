@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jogo da Velha (Tic-Tac-Toe)</title>
+
+    <!-- Link para o CSS -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+    <div class="game-container">
+        <h1>Jogo da Velha</h1>
+
+        <div class="mode-selection">
+            <p>Selecione o Modo de Jogo:</p>
+            <button id="mode-player" onclick="setMode('player')">2 Jogadores</button>
+            <button id="mode-bot" onclick="showDifficultySelection()">Contra o Bot (IA)</button>
+        </div>
+        
+        <div id="difficulty-selection" class="difficulty-selection" style="display: none;">
+            <label for="difficulty">Dificuldade do Bot:</label><br>
+            <select id="difficulty">
+                <option value="easy">Fácil</option>
+                <option value="medium">Médio</option>
+                <option value="hard">Impossível (Minimax)</option>
+            </select>
+            <button onclick="setMode('bot')">Confirmar</button>
+        </div>
+
+        <div id="game-area" style="display: none;">
+            <p id="status">Selecione uma célula</p>
+            <div class="board" id="board"></div>
+            <button id="reset-button" onclick="resetGame()">Reiniciar Jogo</button>
+        </div>
+    </div>
+
+    <br>
+    <center>
+        <a href="../index.html">
+            <button style="color:white;">Menu Principal</button>
+        </a>
+    </center>
+
+    <!-- Script principal -->
+    <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>www.termods.com.br</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="estilo.css">
+</head>
+<body>
+  <canvas class="particles"></canvas>
+
+  <div id="game-container">
+    <h1><span class="icon">💻</span> <span style="color: rgba(255, 0, 0, 0.733);">Termo</span> 
+      <span style="font-size:1.2rem;color:#6607ff;text-shadow:0 0 8px #8707ff99;">Ds</span>
+    </h1>
+
+    <h2><i class="fa-solid fa-heart-pulse"></i> Tentativas</h2>
+    <div id="lives">❤️❤️❤️❤️❤️</div>
+
+    <div id="grid"></div>
+
+    <div class="input-row">
+      <input type="text" id="guess" maxlength="5" placeholder="Palavra..." autocomplete="off" />
+      <button onclick="submitGuess()"><i class="fa-solid fa-check"></i> Tentar</button>
+      <button onclick="restartGame()"><i class="fa-solid fa-rotate"></i> Reiniciar</button>
+      <button id="hint-btn" title="Dica"><i class="fa-solid fa-lightbulb"></i> Dica</button>
+    </div>
+
+    <div id="hint"></div>
+    <div id="message"></div>
+  </div>
+
+  <div id="win-screen">
+    <div class="trophy"><i class="fa-solid fa-trophy"></i></div>
+    <div>🎉 Você acertou a palavra!</div>
+    <button onclick="restartGame()"><i class="fa-solid fa-play"></i> Jogar Novamente</button>
+  </div>
+
+  <div id="footer">
+    &copy; 2025 Termo 2° DS — Jogo inspirado no clássico Termo.<br>
+    Desenvolvido para fins educacionais.
+  </div>
+
+  <br>
+  <center>
+    <a href="../index.html"><button>Menu Principal</button></a>
+  </center>
+
+  <script src="script.js"></script>
+</body>
+</html>
